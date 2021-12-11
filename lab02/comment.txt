@@ -1,3 +1,6 @@
 最后的vector-test 需要手动编译
 
 gcc -o vector-test vector-test.c vector.c vector.h
+
+
+利用vector-memcheck测试

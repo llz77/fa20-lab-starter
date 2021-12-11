@@ -128,19 +128,23 @@ void vector_set(vector_t *v, size_t loc, int value) {
     if (loc > (v->size - 1)) {
         int prevSize = v->size;
         int newSize = loc + 1;
+        // 为扩大分配内存
         int *newData = malloc(sizeof(int) * newSize);
 
         if (newData == NULL) {
             allocation_failed();
         }
+
+
         int p = 0;
-        // 复制内容
+        // 分两段复制内容， 一段是原先的，一段是0
         for (; p < prevSize; p++) {
             newData[p] = v -> data[p];
         }
         for (; p < newSize; p++) {
             newData[p] = 0;
         }
+        // 释放原数据的内存
         free(v->data);
         v->size = newSize;
         v->data = newData;      
