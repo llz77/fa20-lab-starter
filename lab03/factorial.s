@@ -22,3 +22,17 @@ main:
 
 factorial:
     # YOUR CODE HERE
+	li t0, 1
+	beq a0, t0, finish
+	addi sp, sp, -8
+	sw ra, 4(sp)       #push ra
+	sw a0, 0(sp)	   #push a0
+	addi a0, a0, -1     #ao = ao - 1
+	jal ra, factorial
+	lw t0, 0(sp)
+	mul a0, a0, t0
+	lw ra, 4(sp)
+	addi sp, sp, 8
+	
+finish:
+	ret

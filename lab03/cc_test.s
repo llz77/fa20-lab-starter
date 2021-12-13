@@ -55,7 +55,7 @@ main:
 # FIXME Fix the reported error in this function (you can delete lines
 # if necessary, as long as the function still returns 1 in a0).
 simple_fn:
-    mv a0, t0
+    #mv a0, t0
     li a0, 1
     ret
 
@@ -77,14 +77,14 @@ simple_fn:
 naive_pow:
     # BEGIN PROLOGUE
     # END PROLOGUE
-    li s0, 1
+    li t0, 1
 naive_pow_loop:
     beq a1, zero, naive_pow_end
-    mul s0, s0, a0
+    mul t0, t0, a0
     addi a1, a1, -1
     j naive_pow_loop
 naive_pow_end:
-    mv a0, s0
+    mv a0, t0
     # BEGIN EPILOGUE
     # END EPILOGUE
     ret
@@ -100,14 +100,16 @@ inc_arr:
     #
     # FIXME What other registers need to be saved?
     #
-    addi sp, sp, -4
+    addi sp, sp, -8
     sw ra, 0(sp)
+	
+	sw s0, 4(sp)
     # END PROLOGUE
     mv s0, a0 # Copy start of array to saved register
-    mv s1, a1 # Copy length of array to saved register
+    mv t1, a1 # Copy length of array to saved register
     li t0, 0 # Initialize counter to 0
 inc_arr_loop:
-    beq t0, s1, inc_arr_end
+    beq t0, t1, inc_arr_end
     slli t1, t0, 2 # Convert array index to byte offset
     add a0, s0, t1 # Add offset to start of array
     # Prepare to call helper_fn
@@ -123,7 +125,9 @@ inc_arr_loop:
 inc_arr_end:
     # BEGIN EPILOGUE
     lw ra, 0(sp)
-    addi sp, sp, 4
+	
+	lw s0, 4(sp)
+    addi sp, sp, 8
     # END EPILOGUE
     ret
 
