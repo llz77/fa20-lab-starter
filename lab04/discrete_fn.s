@@ -77,7 +77,10 @@ main:
 # Think: why might having a1 be useful?
 f:
     # YOUR CODE GOES HERE!
-
+	addi a0, a0, 3 #加3调整到初始值为0,将a0乘上4
+	slli a0, a0, 2
+	add a0, a0, a1 # 将数组位移加上起始值
+	lw a0, 0(a0)   # 从数组中提出值放入a0，等待返回
     jr ra               # Always remember to jr ra after your function!
 
 print_int:
