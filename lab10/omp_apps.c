@@ -1,103 +1,56 @@
 #include "omp_apps.h"
 
-/* -------------------------------Utilties, Do Not Modify------------------------------*/
+/* -------------------------------Dot Product------------------------------*/
 double* gen_array(int n) {
   double* array = (double*)malloc(n * sizeof(double));
   for (int i = 0; i < n; i++) array[i] = drand48();
   return array;
 }
 
-int verify(double* x, double* y, void(*funct)(double *x, double *y, double *z)) {
-  double *z_v_add = (double*) malloc(ARRAY_SIZE*sizeof(double));
-  double *z_oracle = (double*) malloc(ARRAY_SIZE*sizeof(double));
-  (*funct)(x, y, z_v_add);
-  for(int i=0; i<ARRAY_SIZE; i++){
-    z_oracle[i] = x[i] + y[i];
-  }
-  for(int i=0; i<ARRAY_SIZE; i++){
-    if(z_oracle[i] != z_v_add[i])
-      return 0; 
-  }
-  return 1;
-}
-
-/* -------------------------------Vector Addition------------------------------*/
-// BEGIN PART 1 EX 2
-void v_add_naive(double* x, double* y, double* z) {
-  #pragma omp parallel
-  {
-    for(int i=0; i<ARRAY_SIZE; i++)
-      z[i] = x[i] + y[i];
-  }
-}
-
-// Adjacent Method
-void v_add_optimized_adjacent(double* x, double* y, double* z) {
-  // TODO: Modify this function
-  // Do NOT use the `for` directive here!
-  #pragma omp parallel
-  {
-    for(int i=0; i<ARRAY_SIZE; i++)
-      z[i] = x[i] + y[i];
-  }
-}
-
-// Chunks Method
-void v_add_optimized_chunks(double* x, double* y, double* z) {
-  // TODO: Modify this function
-  // Do NOT use the `for` directive here!
-  #pragma omp parallel
-  {
-    for(int i=0; i<ARRAY_SIZE; i++)
-      z[i] = x[i] + y[i];
-  }
-}
-// END PART 1 EX 2
-
-/* -------------------------------Dot Product------------------------------*/
-// BEGIN PART 1 EX 3
 double dotp_naive(double* x, double* y, int arr_size) {
   double global_sum = 0.0;
 #pragma omp parallel
   {
-    #pragma omp for
+#pragma omp for
     for (int i = 0; i < arr_size; i++)
-      #pragma omp critical
+#pragma omp critical
       global_sum += x[i] * y[i];
   }
   return global_sum;
 }
 
-// Manual Reduction
+// EDIT THIS FUNCTION PART 1
 double dotp_manual_optimized(double* x, double* y, int arr_size) {
-  // TODO: Modify this function
-  // Do NOT use the `reduction` directive here!
   double global_sum = 0.0;
-  #pragma omp parallel
+  int i;
+#pragma omp parallel for lastprivate(i)
+    for (i = 0; i <= arr_size - 4; i += 4) {
+#pragma omp critical
   {
-    #pragma omp for
-    for (int i = 0; i < arr_size; i++)
-      #pragma omp critical
+//      printf("%d\n", i);
       global_sum += x[i] * y[i];
+      global_sum += x[i+1] * y[i+1];
+      global_sum += x[i+2] * y[i+2];
+      global_sum += x[i+3] * y[i+3];
   }
+}
+//printf("final i : %d\n", i);
+  for (; i < arr_size; i++)
+    global_sum += x[i] * y[i];
   return global_sum;
 }
 
-// Reduction Keyword
+// EDIT THIS FUNCTION PART 2
 double dotp_reduction_optimized(double* x, double* y, int arr_size) {
-  // TODO: Modify this function
-  // Please DO use the `reduction` directive here!
   double global_sum = 0.0;
-  #pragma omp parallel
+#pragma omp parallel
   {
-    #pragma omp for
+#pragma omp for reduction(+:global_sum)
     for (int i = 0; i < arr_size; i++)
-      #pragma omp critical
       global_sum += x[i] * y[i];
   }
   return global_sum;
 }
-// END PART 1 EX 3
 
 char* compute_dotp(int arr_size) {
   // Generate input vectors
@@ -190,7 +143,7 @@ char *image_proc(const char* filename) {
    unsigned int hgt = img.img_header.biHeight;
    bmp_img_init_df(&img_copy, wid, hgt);
 
-   // To parallelize these for loops, check out scheduling policy: http://jakascorner.com/blog/2016/06/omp-for-scheduling.html
+   // To parallelize this for loops, check out scheduling policy: http://jakascorner.com/blog/2016/06/omp-for-scheduling.html
    // and omp collapse directive https://software.intel.com/en-us/articles/openmp-loop-collapse-directive
    for (int i = 1; i < hgt-1; i++) {
       for (int j = 1; j < wid-1; j++) {

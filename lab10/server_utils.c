@@ -81,19 +81,17 @@ void http_serve_directory(int socket_fd,  char *path) {
    DIR *dir = opendir(path);
    struct dirent *ent;
    char* fname;
-   char buf[256];
+   char buf[64];
 
    http_make_header(socket_fd, "text/html", 200, -1);
-   char* start = "<ul>";
-   http_send_string(socket_fd, start);
+   char *parent = "<a href=\"../\">Parent directory</a>";
+   http_send_string(socket_fd, parent);
 
    while ((ent = readdir(dir)) != NULL) {
       fname = ent->d_name;
-      sprintf(buf, "<li><a href=\".%s%s\">%s</a></li>\n", path, fname, fname);
+      sprintf(buf, "<a href=\".%s%s\">%s</a>\n", path, fname, fname);
       http_send_string(socket_fd, buf);
    }
-   char *end = "</ul>";
-   http_send_string(socket_fd, end);
 }
 
 void http_make_error(int socket_fd, int status) {
@@ -133,7 +131,7 @@ inline int start_with(char *src, char *target) {
  *      send index.html. otherwise list files in the directory with links.
  *   4) Send a 404 Not Found if no result found. */
 void handle_files_request(int socket_fd, struct http_request *request) {
-   char path[128] = {0};
+   char path[64] = {0};
    path[0] = '.';
 
    // If requested file is a bmp image, apply sobel edge detector
@@ -152,7 +150,7 @@ void handle_files_request(int socket_fd, struct http_request *request) {
       http_serve_file(socket_fd, path, file_stat.st_size);
       return;
    } else if ((file_stat.st_mode & __S_IFMT) == __S_IFDIR) {
-      char path_origin[128] = {0};
+      char path_origin[90] = {0};
       strncpy(path_origin, path, strlen(path));
       strcat(path, "//index.html");
       if (stat(path, &file_stat) == -1) {
@@ -251,17 +249,17 @@ void serve_forever(int *socket_number) {
 
       pid_t parent_pid = getpid();
 #ifdef PROC
-      // PART 2 TASK: Implement forking
+      // PART2 TASK: Implement forking
       /* YOUR CODE HERE */
 
       if (/* YOUR CODE HERE */) {
-         // This line kills the child process if parent dies
+         // Kill child process if parent dies
          int r = prctl(PR_SET_PDEATHSIG, SIGTERM);
 
          /* YOUR CODE HERE */
          
-         // These lines exit the current process with code 1 
-         // 1) when there was an error in prctl, 2) when the parent has been killed
+         // Exit with code 1 when there was an error, 
+         // or when the parent has been killed
          if (r == -1 || getppid() != parent_pid) {
             perror(0);
             exit(1);

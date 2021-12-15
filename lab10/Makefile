@@ -1,4 +1,4 @@
-CC=gcc
+CC=gcc-9
 CFLAGS= -std=gnu99 -c -fopenmp
 LDFLAGS=-fopenmp
 OBJECTS=$(SOURCES:.c=.o)
@@ -8,7 +8,7 @@ EXECUTABLES=v_add dotp hello server_basic server_process
 
 all: $(EXECUTABLES)
 
-v_add: v_add.o omp_app.o libbmp.o
+v_add: v_add.o
 hello: hello.o
 dotp: dotp.o omp_app.o libbmp.o
 server_basic: server_basic.o libhttp.o omp_apps.o server_utils_serial.o libbmp.o
