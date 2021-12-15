@@ -15,6 +15,13 @@ def sumCounts(a, b):
     """ Add up the values for each word, resulting in a count of occurences """
     return a + b
 
+file = SparkContext.sequenceFile("./textFiles/billOfRights.txt")
+
+
+# +
+# SparkContext.sequenceFile?
+# -
+
 def wordCount(file_name, output="spark-wc-out-wordCount"):
     sc = SparkContext("local[8]", "WordCount", conf=SparkConf().set("spark.hadoop.validateOutputSpecs", "false"))
     """ Reads in a sequence file FILE_NAME to be manipulated """
