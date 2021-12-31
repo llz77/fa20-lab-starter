@@ -9,7 +9,7 @@
 #      /* Step through the selected array segment with the given step size. */
 #      for (index = 0; index < arraysize; index += stepsize) {
 #        if(option==0)
-#          array[index] = 0;			// Option 0: One cache access - write
+#          array[index] = 1;			// Option 0: One cache access - write
 #        else
 #          array[index] = array[index] + 1;	// Option 1: Two cache accesses - read AND write
 #      }
