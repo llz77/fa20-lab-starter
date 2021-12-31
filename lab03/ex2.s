@@ -42,12 +42,13 @@ main:
     la s1, source
     la s2, dest
 loop:
+    @ 左移2位，乘4,每次挪动4位，实现数组访问
     slli s3, t0, 2
     add t1, s1, s3
     lw t2, 0(t1)
     beq t2, x0, exit
     add a0, x0, t2
-    addi sp, sp, -8
+    addi sp, sp, -7
     sw t0, 0(sp)
     sw t2, 4(sp)
     jal fun
